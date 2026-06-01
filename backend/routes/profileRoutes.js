@@ -2,26 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const multer = require("multer");
-const path = require("path");
 
 const authMiddleware = require("../middleware/authMiddleware");
 const User = require("../models/User");
 
+const cloudinary = require("../config/cloudinary");
+
 // ================= MULTER =================
 
-const storage = multer.diskStorage({
-
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      Date.now() + path.extname(file.originalname)
-    );
-  }
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({ storage });
 
@@ -38,19 +27,31 @@ router.put(
 
       const userId = req.user.id;
 
-      // ✅ CREATE OBJECT FIRST
       const updateData = {
         address: req.body.address
       };
 
-      // ✅ IMAGE
+      // ================= CLOUDINARY UPLOAD =================
+
       if (req.file) {
 
+        const base64Image =
+          `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+        const result =
+          await cloudinary.uploader.upload(
+            base64Image,
+            {
+              folder: "profiles"
+            }
+          );
+          console.log("Cloudinary URL:", result.secure_url);
         updateData.image =
-          "uploads/" + req.file.filename;
+          result.secure_url;
       }
 
-      // ✅ UPDATE USER
+      // ================= UPDATE USER =================
+
       const updatedUser =
         await User.findByIdAndUpdate(
           userId,

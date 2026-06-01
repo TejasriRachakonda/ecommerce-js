@@ -105,16 +105,13 @@ function Profile() {
         <div className="relative w-fit mx-auto">
 
           <img
-            src={
-              image
-                ? image.startsWith("blob:")
-                  ? image
-                  : `http://localhost:5000/${image}`
-                : "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-            }
-            alt="profile"
-            className="w-28 h-28 rounded-full border-4 border-pink-500 object-cover"
-          />
+  src={
+    image ||
+    "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+  }
+  alt="profile"
+  className="w-28 h-28 rounded-full border-4 border-pink-500 object-cover"
+/>
 
           <button
             onClick={() => fileRef.current.click()}
